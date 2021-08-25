@@ -22,6 +22,12 @@ public class MachineController {
         VendingMachine machine = machineService.createMachine();
         return ResponseEntity.ok().body(machine);
     }
+    // 지금은 필요없지만 추후에 기계 관련 필드 추가되면!
+    @GetMapping(path = "machine/{machineId}")
+    public ResponseEntity<VendingMachine> getMachine(@PathVariable Long machineId) {
+        VendingMachine machine = machineService.getMachine(machineId);
+        return ResponseEntity.ok().body(machine);
+    }
     // 자판기 금액 반환
     @GetMapping(path = "machine/{machineId}/balance")
     public ResponseEntity<Integer> getBalance(@PathVariable long machineId) {
