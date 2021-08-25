@@ -31,7 +31,7 @@ public class MachineController {
     // 자판기 금액 반환
     @GetMapping(path = "machine/{machineId}/balance")
     public ResponseEntity<Integer> getBalance(@PathVariable long machineId) {
-        int balance = machineService.getBalance(machineId);
+        int balance = machineService.refundBalance(machineId);
         return ResponseEntity.ok(balance);
     }
     // 자판기 금액 충전

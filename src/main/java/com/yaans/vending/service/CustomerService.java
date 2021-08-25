@@ -9,6 +9,7 @@ import com.yaans.vending.repository.StockRepository;
 import com.yaans.vending.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -16,16 +17,21 @@ import java.util.List;
 @RequiredArgsConstructor
 public class CustomerService {
 
+    private final MachineService machineService;
     private final MachineRepository machineRepository;
     private final StockRepository stockRepository;
     private final UserRepository userRepository;
     private final CustomerRepository customerRepository;
 
-    public int refundChange(long machineId) {
-        VendingMachine machine = machineRepository.getById(machineId);
-        int change = machine.getBalance();
-        machine.setBalance(0);
-//        machineRepository.save(machine);
+    @Transactional
+    public int refundChange(Long customerId, Long machineId) {
+        // get From Machine
+        int change = machineService.refundBalance(machineId);
+
+        // set to Customer
+        Customer customer = getCustomer(customerId);
+        customer.setBudget(customer.getBudget() + change);
+        customerRepository.save(customer);
         return change;
     }
 

@@ -3,6 +3,7 @@ package com.yaans.vending.service;
 import com.yaans.vending.domain.Product;
 import com.yaans.vending.domain.Stock;
 import com.yaans.vending.domain.VendingMachine;
+import com.yaans.vending.error.IllegalMachineStateException;
 import com.yaans.vending.repository.MachineRepository;
 import com.yaans.vending.repository.ProductRepository;
 import com.yaans.vending.repository.StockRepository;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +25,14 @@ public class MachineService {
         return productList;
     }
 
-    public int getBalance(Long machineId) {
-        int balance = machineRepository.getById(machineId).getBalance();
+    public int refundBalance(Long machineId) throws NoSuchElementException {
+        VendingMachine machine = machineRepository.findById(machineId).orElseThrow();   // NoSuchElementException
+        int balance = machine.getBalance();
+
+        if(balance < 0) throw new IllegalMachineStateException();
+
+        machine.setBalance(0);
+        machineRepository.save(machine);
         return balance;
     }
 

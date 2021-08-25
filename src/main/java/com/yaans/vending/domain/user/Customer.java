@@ -21,11 +21,14 @@ import java.util.List;
 public class Customer extends User{
 
     @Column(name = "ct_budget")
-    @ColumnDefault("5000")
+    @ColumnDefault("0")
     private int budget;
 
     @OneToMany
     @Column(name = "ct_belong")
     private List<Product> belong;
 
+    public void setBudget(int budget) {
+        this.budget = budget;
+    }
 }

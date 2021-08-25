@@ -13,12 +13,12 @@ import javax.persistence.*;
 public class Product {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "product_id")
+    @Column(name = "product_id", nullable = false)
     private Long id;
 
-    @Column(name = "product_name")
+    @Column(name = "product_name", nullable = false)
     private String name;
-    @Column(name = "product_price")
+    @Column(name = "product_price", columnDefinition = "5000")
     private Integer price;
 
 }
