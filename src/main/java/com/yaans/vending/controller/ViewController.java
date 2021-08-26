@@ -32,12 +32,35 @@ public class ViewController {
         return "register";
     }
 
-    @GetMapping(path = "vending-machine/{machineId}")
-    public String vendingMachine(Model model, @PathVariable Long machineId) {
+    @GetMapping(path = "customer/{customerId}/machines")
+    public String machineList(@PathVariable Long customerId,
+                              Model model) {
+        List<VendingMachine> machineList = machineService.getMachineList();
+
+        model.addAttribute("customerId", customerId);
+        model.addAttribute("machineList", machineList);
+        return "machine-list";
+    }
+
+    @GetMapping(path = "manager/machine/new")
+    public String newMachine() {
+
+        return "new-machine";
+    }
+
+    @GetMapping(path = "customer/{customerId}/machines/{machineId}")
+    public String vendingMachine(@PathVariable Long machineId,
+                                 @PathVariable Long customerId,
+                                 Model model) {
+        // machine
         VendingMachine machine = machineService.getMachine(machineId);
         List<Stock> stockList = machineService.getStockList(machineId);
+        // customer
+        Customer customer = customerService.getCustomer(customerId);
+
         model.addAttribute("machine", machine);
         model.addAttribute("stockList", stockList);
+        model.addAttribute("customer", customer);
 
         return "machine";
     }

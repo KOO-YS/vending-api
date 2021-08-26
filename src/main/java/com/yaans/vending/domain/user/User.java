@@ -19,10 +19,11 @@ import javax.persistence.*;
 public abstract class User {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "user_id")
+    @Column(name = "user_id", updatable = false)
     private long id;
 
-    @Column(name = "user_name")
+    @Column(name = "user_name", nullable = false, length = 50)
     private String name;
+
 
 }

@@ -1,6 +1,7 @@
 package com.yaans.vending.domain;
 
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import java.util.List;
@@ -16,7 +17,8 @@ public class VendingMachine {
     @Column(name = "machine_id")
     private Long id;
 
-    @Column(name = "balance")
+    @Column(name = "balance", nullable = false)
+    @ColumnDefault("0")
     private Integer balance;
 
     public void setBalance(int balance) {

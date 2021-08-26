@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 
@@ -14,7 +15,8 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class Manager extends User{
 
-    @Column(name = "manager_level")
     @Enumerated(EnumType.STRING)
+    @Column(name = "manager_level")
+//    @ColumnDefault("AccessLevel.SUPER")
     AccessLevel accessLevel;
 }

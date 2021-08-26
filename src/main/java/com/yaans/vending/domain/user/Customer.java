@@ -15,9 +15,9 @@ import java.util.List;
 @Entity(name = "customer")
 @Getter
 @SuperBuilder
-@ToString
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString
 public class Customer extends User{
 
     @Column(name = "ct_budget")

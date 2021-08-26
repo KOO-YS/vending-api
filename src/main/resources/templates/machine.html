@@ -5,42 +5,49 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
     <title>Document</title>
-    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
-    <!--    <script src="js/includeFile.js"></script>-->
+<!--<style>-->
+<!--    .container {-->
+<!--        margin-top: 3em;-->
+<!--    }-->
+<!--</style>-->
 </head>
 <body>
-<!--<script type="text/javascript">-->
-<!--    $(document).ready(function(){-->
-<!--        $("#header").load("templates/header.html");-->
-<!--    });-->
-<!--</script>-->
-<div id="header"></div>
 <div class="container" style="background-color: gainsboro;">
-    <h1><span th:text="${machine.id}"></span>번 자판기 : <p>이름</p></h1>
-    <h3>machine 정보</h3>
-    <div class="row" th:each="stock: ${stockList}">
-        <div class="col-3 text-center product">
-            <h4> <span th:text="${stock.product.name}">상품</span> <span th:text="${stock.product.price}"></span> </h4>
-            <h5><span th:text="${stock.count}"></span>개</h5>
-            <button class="btn btn-primary" th:onclick="'javascript:buy('+${stock.id}+')'"> SELECT</button>
+    <h1> <span th:text="${machine.id}"></span>번 자판기 : <span> + </span></h1>
+    <h3>충전 금액 :  &#8361;<span th:text="${machine.balance}"></span></h3>
+    <br>
+    <hr>
+    <br>
+    <div class="row">
+        <div th:each="stock: ${stockList}" class="col-4 text-center product">
+                <h4> <span th:text="${stock.product.name}">상품</span> [ &#8361;<span th:text="${stock.product.price}"></span>] </h4>
+                <h5><span th:text="${stock.count}"></span>개</h5>
+                <button class="btn btn-primary" th:onclick="'javascript:buy('+${stock.id}+','+${customer.id} +')'"> SELECT</button>
         </div>
     </div>
 
 </div>
 <div class="container">
-    <h1>Customer's</h1>
-    <h3>budget : 5000</h3>
+    <h3><span th:text="${customer.name}"></span>'s info</h3>
+    <h5>budget :  &#8361;<span th:text="${customer.budget}"></span></h5>
+    <hr>
     <p>
         <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
-            Link with href
+            금액 충전
         </a>
     </p>
     <div class="collapse" id="collapseExample">
         <div class="card card-body">
-            <form action="">
-                <input type="text" name="balance" id="">
-                <button class="btn btn-secondary"> charge</button>
+            <form>
+                <input type="hidden" id="customerId" th:value="${customer.id}">
+                <input type="hidden" id="machineId" th:value="${machine.id}">
+                <input type="text" name="balance" id="balance">
+                <button class="btn btn-secondary" type="button" onclick="chargeBalance();">charge</button>
             </form>
         </div>
     </div>
@@ -50,14 +57,45 @@
 <div class="container">
     <h1>Manager's</h1>
 </div>
-<script src="js/jquery-3.6.0.min.js"></script>
-<script src="js/bootstrap.min.js"></script>
 <script type="text/javascript">
-function buy(stockId) {
+function buy(stockId, customerId) {
     alert(stockId+" pick");
+    alert(customerId+" choose");
+
+    let data = {
+        "stockId" : stockId,
+        "customerId" : customerId
+    };
+
 
 
 }
+
+function chargeBalance() {
+    let customerId = $("#customerId").val();
+    let machineId = $("#machineId").val();
+    let balance = $("#balance").val();
+
+    let data = {
+        "customerId" : customerId,
+        "machineId" : machineId,
+        "balance" : balance
+    };
+
+    jQuery.ajax({
+        type : 'POST',
+        url : "/customer/charge",
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        success: function(msg) {
+            alert(msg);
+            window.location.assign("/customer/"+customerId+"/machines/"+machineId);
+        }, err: function (msg) {
+            alert(msg);
+        }
+    });
+}
+
 </script>
 </body>
 </html>

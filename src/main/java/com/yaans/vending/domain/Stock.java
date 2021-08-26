@@ -8,7 +8,7 @@ import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 
-@Entity(name = "stock")
+@Entity(name = "stocks")
 @Builder
 @Getter
 @AllArgsConstructor
@@ -21,14 +21,14 @@ public class Stock {
 
     // JPA 연관관계 주인은 외래키를 관리하는 곳
     @ManyToOne
-    @JoinColumn(name = "machine_id")
+    @JoinColumn(name = "machine_id", nullable = false)
     private VendingMachine vendingMachine;
 
     @OneToOne
-    @JoinColumn(name = "product_id")
+    @JoinColumn(name = "product_id", nullable = false)
     private Product product;
 
-    @Column(name = "stock_count")
+    @Column(name = "stock_count", nullable = false)
     @ColumnDefault("0")
     private Integer count;
 

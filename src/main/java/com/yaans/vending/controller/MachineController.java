@@ -3,13 +3,17 @@ package com.yaans.vending.controller;
 import com.yaans.vending.domain.Product;
 import com.yaans.vending.domain.Stock;
 import com.yaans.vending.domain.VendingMachine;
+import com.yaans.vending.error.IllegalMachineStateException;
+import com.yaans.vending.error.InvalidNumberException;
 import com.yaans.vending.service.MachineService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequiredArgsConstructor
@@ -18,8 +22,14 @@ public class MachineController {
 
     // 자판기 기계 등록
     @GetMapping(path = "machine/new")
-    public ResponseEntity<VendingMachine> createMachine() {
-        VendingMachine machine = machineService.createMachine();
+    public ResponseEntity createMachine() {
+        VendingMachine machine = null;
+        try {
+            machine = machineService.createMachine();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().body("자판기를 생성할 수 없습니다");
+        }
         return ResponseEntity.ok().body(machine);
     }
     // 지금은 필요없지만 추후에 기계 관련 필드 추가되면!
@@ -30,16 +40,31 @@ public class MachineController {
     }
     // 자판기 금액 반환
     @GetMapping(path = "machine/{machineId}/balance")
-    public ResponseEntity<Integer> getBalance(@PathVariable long machineId) {
-        int balance = machineService.refundBalance(machineId);
+    public ResponseEntity getBalance(@PathVariable long machineId) {
+        int balance;
+        try {
+            balance = machineService.refundBalance(machineId);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.badRequest().body("해당 자판기가 존재하지 않습니다.");
+        } catch (IllegalMachineStateException e) {
+            return ResponseEntity.internalServerError().body(e.getMessage());
+        }
         return ResponseEntity.ok(balance);
     }
     // 자판기 금액 충전
     @PostMapping(path = "machine/{machineId}/balance")
     public ResponseEntity<String> setBalance(@PathVariable long machineId,
-                                            @RequestBody Map<String, Integer> map) {
-        int balance = map.get("balance");
-        machineService.setBalance(machineId, balance);
+//                                            @RequestBody Map<String, Integer> map) {
+//                                            !! QUESTION about https://stackoverflow.com/questions/49192783/get-integer-on-requestbody
+                                             @RequestBody Integer balance) {
+//        int balance = map.get("balance");
+        try {
+            machineService.setBalance(machineId, balance);
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.badRequest().body("해당 자판기가 존재하지 않습니다");
+        } catch (InvalidNumberException ne) {
+            return ResponseEntity.badRequest().body(ne.getMessage());
+        }
         return ResponseEntity.ok().body("금액 충전 완료");
     }
     
@@ -70,13 +95,13 @@ public class MachineController {
 
     // 상품 저장
     @PostMapping(path = "product")
-    public ResponseEntity<String> saveProduct(@RequestBody Product product) {
+    public ResponseEntity saveProduct(@RequestBody Product product) {
         Product save = Product.builder().name(product.getName()).price(product.getPrice()).build();
         String result;
-        if(machineService.saveProduct(save))
-            result = "success";
-        else result = "fail";
-        return ResponseEntity.ok(result);
+        if(!machineService.saveProduct(save))
+            return ResponseEntity.internalServerError().body("상품 저장에 오류가 발생했습니다.");
+
+        return ResponseEntity.ok(save);
     }
 
     // 상품 확인
