@@ -1,4 +1,4 @@
-package com.yaans.vending.error;
+package com.yaans.vending.error.custom;
 
 public class InvalidNumberException extends RuntimeException {
     public InvalidNumberException() {

@@ -3,8 +3,10 @@ package com.yaans.vending.controller;
 import com.yaans.vending.domain.Stock;
 import com.yaans.vending.domain.VendingMachine;
 import com.yaans.vending.domain.user.Customer;
+import com.yaans.vending.domain.user.Manager;
 import com.yaans.vending.service.CustomerService;
 import com.yaans.vending.service.MachineService;
+import com.yaans.vending.service.ManagerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,12 +20,17 @@ import java.util.List;
 public class ViewController {
 
     private final CustomerService customerService;
+    private final ManagerService managerService;
     private final MachineService machineService;
 
     @GetMapping(path = "")
     public String index(Model model) {
         List<Customer> customerList = customerService.getCustomerList();
+        List<Manager> managerList = managerService.getManagerList();
+
         model.addAttribute("customerList", customerList);
+        model.addAttribute("managerList", managerList);
+
         return "index";
     }
 
@@ -33,11 +40,21 @@ public class ViewController {
     }
 
     @GetMapping(path = "customer/{customerId}/machines")
-    public String machineList(@PathVariable Long customerId,
+    public String machineListByC(@PathVariable Long customerId,
                               Model model) {
         List<VendingMachine> machineList = machineService.getMachineList();
 
         model.addAttribute("customerId", customerId);
+        model.addAttribute("machineList", machineList);
+        return "machine-list";
+    }
+
+    @GetMapping(path = "manager/{managerId}/machines")
+    public String machineListByM(@PathVariable Long managerId,
+                                Model model) {
+        List<VendingMachine> machineList = machineService.getMachineList();
+
+        model.addAttribute("managerId", managerId);
         model.addAttribute("machineList", machineList);
         return "machine-list";
     }

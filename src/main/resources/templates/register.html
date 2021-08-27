@@ -82,7 +82,7 @@ function createManager() {
         success: function(msg) {
             console.log(msg);
             alert("성공");
-            window.location.assign("/vending-machine/7");
+            window.location.assign("manager/"+data.id+"/machines");
         }
     });
 }

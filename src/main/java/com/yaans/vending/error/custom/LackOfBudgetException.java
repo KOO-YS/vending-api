@@ -1,4 +1,4 @@
-package com.yaans.vending.error;
+package com.yaans.vending.error.custom;
 
 public class LackOfBudgetException extends RuntimeException {
     public LackOfBudgetException() {

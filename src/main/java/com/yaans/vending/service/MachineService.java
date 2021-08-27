@@ -3,8 +3,8 @@ package com.yaans.vending.service;
 import com.yaans.vending.domain.Product;
 import com.yaans.vending.domain.Stock;
 import com.yaans.vending.domain.VendingMachine;
-import com.yaans.vending.error.IllegalMachineStateException;
-import com.yaans.vending.error.InvalidNumberException;
+import com.yaans.vending.error.custom.IllegalMachineStateException;
+import com.yaans.vending.error.custom.InvalidNumberException;
 import com.yaans.vending.repository.MachineRepository;
 import com.yaans.vending.repository.ProductRepository;
 import com.yaans.vending.repository.StockRepository;
@@ -87,5 +87,11 @@ public class MachineService {
     public List<VendingMachine> getMachineList() {
         List<VendingMachine> machineList = machineRepository.findAll();
         return machineList;
+    }
+
+    public void stockDown(Long stockId) {
+        Stock stock = stockRepository.findById(stockId).orElseThrow();
+        stock.setCount(stock.getCount()-1);
+        stockRepository.save(stock);
     }
 }

@@ -1,9 +1,8 @@
 package com.yaans.vending.service;
 
-import com.yaans.vending.domain.VendingMachine;
+import com.yaans.vending.domain.Product;
 import com.yaans.vending.domain.user.Customer;
-import com.yaans.vending.domain.user.User;
-import com.yaans.vending.error.LackOfBudgetException;
+import com.yaans.vending.error.custom.LackOfBudgetException;
 import com.yaans.vending.repository.CustomerRepository;
 import com.yaans.vending.repository.MachineRepository;
 import com.yaans.vending.repository.StockRepository;
@@ -72,5 +71,11 @@ public class CustomerService {
         customerRepository.save(customer);
 
         return result;
+    }
+
+    public void setCustomerBelong(long customerId, long productId) {
+        Customer customer = getCustomer(customerId);
+        Product product = machineService.getProduct(productId);
+        customer.addBelong(product);
     }
 }

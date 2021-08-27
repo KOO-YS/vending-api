@@ -1,13 +1,16 @@
 package com.yaans.vending.controller;
 
 import com.yaans.vending.domain.dto.BalanceSet;
+import com.yaans.vending.domain.dto.BuySet;
 import com.yaans.vending.domain.dto.newCustomer;
 import com.yaans.vending.domain.user.Customer;
-import com.yaans.vending.error.IllegalMachineStateException;
+import com.yaans.vending.error.custom.IllegalMachineStateException;
 import com.yaans.vending.service.CustomerService;
+import com.yaans.vending.service.MachineService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityNotFoundException;
@@ -19,6 +22,7 @@ import java.util.NoSuchElementException;
 public class CustomerController {
 
     private final CustomerService customerService;
+    private final MachineService machineService;
 
     @PostMapping(path = "customer")
     public ResponseEntity createCustomer(@Valid @RequestBody newCustomer input) {
@@ -65,8 +69,21 @@ public class CustomerController {
         return ResponseEntity.status(HttpStatus.OK).body("충전 성공");
     }
 
-    // TODO 상품 선택 -> Post path = "/product"
+    // 상품 선택
+    @Transactional
+    @PostMapping(path = "customer/product")
+    public ResponseEntity pickProduct(@RequestBody BuySet set) {
 
+        Long customerId = set.getCustomerId();
+        Long stockId = set.getStockId();
+        Long productId = set.getProductId();
+        // customer belong에 product 새로 담기
+        customerService.setCustomerBelong(customerId, productId);
+        // stock에서 count 제거
+        machineService.stockDown(stockId);
+
+        return ResponseEntity.ok("SUCCESS");
+    }
 
     // 금액 환불
     @GetMapping(path = "customer/{customerId}/refund/{machineId}")

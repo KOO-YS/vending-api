@@ -32,7 +32,6 @@
                 <div class="card-body">
                     <div class="list-group">
                         <div th:each="customer: ${customerList}">
-<!--                            <a th:href="@{customer/{customer.id}}" class="list-group-item list-group-item-action"><span th:text="${customer.name}"></span>님 :: <span th:text="${customer.budget}"></span>원</a>-->
                             <a th:href="@{customer/__${customer.id}__/machines}" class="list-group-item list-group-item-action"><span th:text="${customer.name}"></span>님 :: <span th:text="${customer.budget}"></span>원</a>
                         </div>
                         <a href="register" class="list-group-item list-group-item-action">Add Customer</a>
@@ -51,7 +50,10 @@
             <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
                 <div class="card-body">
                     <div class="list-group">
-                        <a href="#" class="list-group-item list-group-item-action">Vestibulum at eros</a>
+                        <div th:each="manager: ${managerList}">
+                            <!--                            <a th:href="@{customer/{customer.id}}" class="list-group-item list-group-item-action"><span th:text="${customer.name}"></span>님 :: <span th:text="${customer.budget}"></span>원</a>-->
+                            <a th:href="@{manager/__${manager.id}__/machines}" class="list-group-item list-group-item-action"><span th:text="${manager.name}"></span>님</span>원</a>
+                        </div>
                         <a href="register" class="list-group-item list-group-item-action">Add Manager</a>
                     </div>
                 </div>

@@ -17,7 +17,7 @@ public class Stock {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
     @Column(name = "stock_id")
-    private Integer id;
+    private Long id;
 
     // JPA 연관관계 주인은 외래키를 관리하는 곳
     @ManyToOne
@@ -32,5 +32,8 @@ public class Stock {
     @ColumnDefault("0")
     private Integer count;
 
+    public void setCount(int c) {
+        this.count = c;
+    }
 
 }

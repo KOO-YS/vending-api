@@ -1,4 +1,4 @@
-package com.yaans.vending.error;
+package com.yaans.vending.error.custom;
 
 public class IllegalMachineStateException extends RuntimeException {
     public IllegalMachineStateException() {
