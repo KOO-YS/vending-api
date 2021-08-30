@@ -16,6 +16,11 @@ spring:
     prefix: classpath:templates/
     check-template-location: true
     suffix: .html
-    mode: HTML5
+    mode: HTML
     template-resolver-order: 0
     cache: true  # 운영시 true
+# 전체 레벨 전체 로깅 레벨 지정
+logging:
+  level:
+    root: info
+    com.yaans.vending.controller: debug

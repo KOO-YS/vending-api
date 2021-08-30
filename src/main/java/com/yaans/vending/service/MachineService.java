@@ -3,18 +3,20 @@ package com.yaans.vending.service;
 import com.yaans.vending.domain.Product;
 import com.yaans.vending.domain.Stock;
 import com.yaans.vending.domain.VendingMachine;
-import com.yaans.vending.error.custom.IllegalMachineStateException;
+import com.yaans.vending.error.LackOfBalanceException;
+import com.yaans.vending.error.custom.EntityNotFoundException;
 import com.yaans.vending.error.custom.InvalidNumberException;
+import com.yaans.vending.error.custom.LackOfBudgetException;
 import com.yaans.vending.repository.MachineRepository;
 import com.yaans.vending.repository.ProductRepository;
 import com.yaans.vending.repository.StockRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.NoSuchElementException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class MachineService {
@@ -27,26 +29,28 @@ public class MachineService {
         return productList;
     }
 
-    public int refundBalance(Long machineId) throws NoSuchElementException {
-        VendingMachine machine = machineRepository.findById(machineId).orElseThrow();   // NoSuchElementException
+    public int refundBalance(Long machineId) throws LackOfBudgetException, IllegalArgumentException {
+        VendingMachine machine = getMachine(machineId);
         int balance = machine.getBalance();
 
-        if(balance < 0) throw new IllegalMachineStateException();
+        if(balance < 0)
+            throw new LackOfBalanceException("환불할 충전 금액이 없습니다 -> machineId = "+machineId);
 
         machine.setBalance(0);
         machineRepository.save(machine);
+
         return balance;
     }
 
-    public VendingMachine createMachine() {
+    public VendingMachine createMachine() throws IllegalArgumentException{
         VendingMachine machine = VendingMachine.builder().balance(0).build();
         return machineRepository.save(machine);
     }
 
-    public VendingMachine getMachine(Long machineId) {
+    public VendingMachine getMachine(Long machineId) throws EntityNotFoundException{
         VendingMachine machine = machineRepository.findById(machineId).orElse(null);
         if (machine == null) {
-            throw new EntityNotFoundException();
+            throw new EntityNotFoundException("해당 Machine이 존재하지 않습니다");
         }
         return machine;
     }
@@ -57,30 +61,37 @@ public class MachineService {
         return (success>0);
     }
 
-    public List<Stock> getStockList(Long machineId) {
+    public List<Stock> getStockList(Long machineId) throws EntityNotFoundException{
         List<Stock> stockList = stockRepository.findByVendingMachine(getMachine(machineId));
         return stockList;
     }
 
-    public Product getProduct(Long productId) {
+    // stock 재고 정보 확인
+    public Stock getStock(Long stockId) throws EntityNotFoundException{
+        Stock stock = stockRepository.findById(stockId).orElse(null);
+        if (stock == null) 
+            throw new EntityNotFoundException(stockId+"번 stock을 찾을 수 없습니다");
+        return stock;
+    }
+
+    public Product getProduct(Long productId) throws EntityNotFoundException{
         Product product = productRepository.findById(productId).orElse(null);
+        if (product == null) 
+            throw new EntityNotFoundException(productId+"번 product를 찾을 수 없습니다");
         return product;
     }
 
-    public void setStock(Long machineId, Long productId, Integer count) {
+    public void setStock(Long machineId, Long productId, Integer count) throws EntityNotFoundException{
         Product product = getProduct(productId);
         Stock stock = Stock.builder().product(product).count(count)
                 .vendingMachine(getMachine(machineId)).build();
         stockRepository.save(stock);
     }
 
-    public void setBalance(long machineId ,int money) {
+    public void setBalance(long machineId ,int money) throws IllegalArgumentException, EntityNotFoundException{
         VendingMachine machine = getMachine(machineId);
-        if (money <= 0) {
-            throw new InvalidNumberException();
-        }
-        machine.setBalance(money);
-        System.out.println("머신에 충전"+money);
+
+        machine.setBalance(machine.getBalance() + money);
         machineRepository.save(machine);
     }
 
@@ -89,8 +100,14 @@ public class MachineService {
         return machineList;
     }
 
-    public void stockDown(Long stockId) {
-        Stock stock = stockRepository.findById(stockId).orElseThrow();
+    public void stockDown(Long stockId) throws EntityNotFoundException{
+        Stock stock = stockRepository.findById(stockId).orElse(null);
+        if (stock == null)
+            throw new EntityNotFoundException("stock을 찾을 수 없습니다. stockId = "+stockId);
+
+        if (stock.getCount() < 1)
+            throw new InvalidNumberException(stockId+"번 stock의 수량이 부족합니다");
+
         stock.setCount(stock.getCount()-1);
         stockRepository.save(stock);
     }

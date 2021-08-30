@@ -12,6 +12,6 @@ public class BuySet {
     @NotNull(message = "stock을 찾을 수 없습니다.")
     private Long stockId;
     
-    @NotNull(message = "product를 선택해주세요")
-    private Long productId;
+    @NotNull(message = "machine을 선택해주세요")
+    private Long machineId;
 }

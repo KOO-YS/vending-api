@@ -1,29 +1,39 @@
 package com.yaans.vending.controller;
 
 import com.yaans.vending.domain.dto.BalanceSet;
+import com.yaans.vending.domain.dto.BudgetSet;
 import com.yaans.vending.domain.dto.BuySet;
 import com.yaans.vending.domain.dto.newCustomer;
 import com.yaans.vending.domain.user.Customer;
+import com.yaans.vending.error.custom.EntityNotFoundException;
 import com.yaans.vending.error.custom.IllegalMachineStateException;
+import com.yaans.vending.error.custom.LackOfBudgetException;
 import com.yaans.vending.service.CustomerService;
 import com.yaans.vending.service.MachineService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.util.NoSuchElementException;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 public class CustomerController {
 
     private final CustomerService customerService;
     private final MachineService machineService;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
+    /**
+     * customer 등록
+     */
     @PostMapping(path = "customer")
     public ResponseEntity createCustomer(@Valid @RequestBody newCustomer input) {
         Customer customer = Customer.builder()
@@ -31,73 +41,75 @@ public class CustomerController {
                 .budget(input.getBudget())
                 .build();
 
-        Customer save;
-        try {
-            save = customerService.createCustomer(customer);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.internalServerError().body("customer를 생성할 수 없습니다");
-        }
+        log.info("INFO :: create customer : {}", customer);
+        Customer save = customerService.createCustomer(customer);
+
         return ResponseEntity.ok().body(save);
     }
 
+    /**
+     * customer 정보 가져오기
+     */
     @GetMapping(path = "customer/{customerId}")
     public ResponseEntity getCustomer(@PathVariable Long customerId) {
-        Customer result;
-        try {
-            result = customerService.getCustomer(customerId);
-        } catch (EntityNotFoundException e) {
-            return ResponseEntity.badRequest().body("관련 customer가 존재하지 않습니다");
-        }
+
+        log.info("INFO :: get customer by id : {}", customerId);
+        Customer result = customerService.getCustomer(customerId);
+
         return ResponseEntity.ok().body(result);
     }
 
-    // 금액 충전
+    /**
+     * 자판기 금액 충전 
+     */
     @PostMapping(path = "customer/charge")
     public ResponseEntity chargeBalance(@Valid @RequestBody BalanceSet set) {
         Long machineId = set.getMachineId();
         Long customerId = set.getCustomerId();
         Integer balance = set.getBalance();
+        log.info("INFO :: customer {} charges balance {} at machine {}", customerId, balance, machineId);
 
-        try {
-            customerService.setMachineBalance(machineId, customerId, balance);
-        } catch (Exception e) {
-            System.out.println("FAIL");
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("충전 실패");
-        }
-        System.out.println("SUCCESS");
-        return ResponseEntity.status(HttpStatus.OK).body("충전 성공");
+        customerService.setMachineBalance(machineId, customerId, balance);
+
+        return ResponseEntity.status(HttpStatus.OK).body("자판기 충전 성공");
     }
 
-    // 상품 선택
-    @Transactional
+    /**
+     * 사용자 예산 충전
+     */
+    @PostMapping(path = "customer/budget")
+    public ResponseEntity chargeBudget(@Valid @RequestBody BudgetSet set) {
+        Long customerId = set.getCustomerId();
+        Integer budget = set.getBudget();
+        log.info("INFO :: customer {} charges budget {} by self", customerId, budget);
+
+        customerService.setBudget(customerId, budget);
+        return ResponseEntity.status(HttpStatus.OK).body("예산 충전 성공");
+    }
+
+    /**
+     * customer 상품 구매
+    */
     @PostMapping(path = "customer/product")
-    public ResponseEntity pickProduct(@RequestBody BuySet set) {
+    public ResponseEntity buyProduct(@RequestBody BuySet set) {
 
         Long customerId = set.getCustomerId();
         Long stockId = set.getStockId();
-        Long productId = set.getProductId();
-        // customer belong에 product 새로 담기
-        customerService.setCustomerBelong(customerId, productId);
-        // stock에서 count 제거
-        machineService.stockDown(stockId);
+        Long machineId = set.getMachineId();
 
-        return ResponseEntity.ok("SUCCESS");
+        log.info("INFO :: {} customer buy a product in stock {} & machine {}", customerId, stockId, machineId);
+        customerService.pickProduct(customerId, stockId, machineId);
+
+        return ResponseEntity.ok("상품 구매 성공");
     }
 
     // 금액 환불
     @GetMapping(path = "customer/{customerId}/refund/{machineId}")
     public ResponseEntity refundChange(@PathVariable Long customerId,
                                       @PathVariable Long machineId) {
-        int change = 0;
-        try {
-            change = customerService.refundChange(customerId, machineId);
+        log.info("INFO :: customer {} refund change about machine {}", customerId, machineId);
 
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.internalServerError().body("해당 자판기가 존재하지 않습니다.");
-        } catch (IllegalMachineStateException e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
-        }
+        int change = customerService.refundChange(customerId, machineId);
         return ResponseEntity.ok().body(change);
     }
 }

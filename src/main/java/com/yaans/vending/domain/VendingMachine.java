@@ -11,6 +11,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 @RequiredArgsConstructor
+@ToString
 public class VendingMachine {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,6 +23,6 @@ public class VendingMachine {
     private Integer balance;
 
     public void setBalance(int balance) {
-        this.balance += balance;
+        this.balance = balance;
     }
 }

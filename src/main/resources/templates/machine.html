@@ -27,7 +27,7 @@
         <div th:each="stock: ${stockList}" class="col-4 text-center product">
                 <h4> <span th:text="${stock.product.name}">상품</span> [ &#8361;<span th:text="${stock.product.price}"></span>] </h4>
                 <h5><span th:text="${stock.count}"></span>개</h5>
-                <button class="btn btn-primary" th:onclick="'javascript:buy('+${stock.id}+','+${customer.id} +','+${stock.product.id} +')'"> SELECT</button>
+                <button class="btn btn-primary" th:onclick="'javascript:buy('+${stock.id}+','+${customer.id} +','+${machine.id} +')'"> SELECT</button>
         </div>
     </div>
 
@@ -36,18 +36,32 @@
     <h3><span th:text="${customer.name}"></span>'s info</h3>
     <h5>budget :  &#8361;<span th:text="${customer.budget}"></span></h5>
     <hr>
+    <input type="hidden" id="customerId" th:value="${customer.id}">
+    <input type="hidden" id="machineId" th:value="${machine.id}">
     <p>
-        <a class="btn btn-primary" data-toggle="collapse" href="#collapseExample" role="button" aria-expanded="false" aria-controls="collapseExample">
+        <a class="btn btn-primary" data-toggle="collapse" href="#collapseBalance" role="button" aria-expanded="false" aria-controls="collapseExample">
             금액 충전
         </a>
     </p>
-    <div class="collapse" id="collapseExample">
+    <div class="collapse" id="collapseBalance">
         <div class="card card-body">
             <form>
-                <input type="hidden" id="customerId" th:value="${customer.id}">
-                <input type="hidden" id="machineId" th:value="${machine.id}">
                 <input type="text" name="balance" id="balance">
                 <button class="btn btn-secondary" type="button" onclick="chargeBalance();">charge</button>
+            </form>
+        </div>
+    </div>
+    <hr>
+    <p>
+        <a class="btn btn-primary" data-toggle="collapse" href="#collapseBudget" role="button" aria-expanded="false" aria-controls="collapseExample">
+            사용자 예산 충전
+        </a>
+    </p>
+    <div class="collapse" id="collapseBudget">
+        <div class="card card-body">
+            <form>
+                <input type="text" name="budget" id="budget">
+                <button class="btn btn-secondary" type="button" onclick="chargeBudget();">charge</button>
             </form>
         </div>
     </div>
@@ -62,14 +76,14 @@
     <h1>Manager's</h1>
 </div>
 <script type="text/javascript">
-function buy(stockId, customerId, productId) {
+function buy(stockId, customerId, machineId) {
     alert(stockId+" pick");
     alert(customerId+" choose");
 
     let data = {
         "stockId" : stockId,
         "customerId" : customerId,
-        "productId" : productId
+        "machineId" : machineId
     };
 
     $.ajax({
@@ -109,6 +123,28 @@ function chargeBalance() {
     });
 }
 
+function chargeBudget() {
+    let customerId = $("#customerId").val();
+    let budget = $("#budget").val();
+
+    let data = {
+        "customerId" : customerId,
+        "budget" : budget
+    };
+
+    jQuery.ajax({
+        type : 'POST',
+        url : "/customer/charge",
+        data: JSON.stringify(data),
+        contentType: "application/json",
+        success: function(msg) {
+            alert(msg);
+            window.location.assign("/customer/"+customerId+"/machines/"+machineId);
+        }, err: function (msg) {
+            alert(msg);
+        }
+    });
+}
 </script>
 </body>
 </html>
