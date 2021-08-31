@@ -1,0 +1,8 @@
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://vending-api.cl6wi7vlsrnn.ap-northeast-2.rds.amazonaws.com:3306/vending?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
+    username: root
+    password: bespin8006^^
+  jpa:
+    show-sql: false

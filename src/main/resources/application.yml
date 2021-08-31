@@ -1,12 +1,22 @@
+server:
+  port: 8088
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+# 전체 레벨 전체 로깅 레벨 지정
+logging:
+  level:
+    root: info
+    com.yaans.vending.controller: debug
+
 spring:
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/vending?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
-    username: root
-    password: root
+  profiles:
+    active: dev
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
-    show-sql: true
+#    show-sql: true
     generate-ddl: false
     hibernate:
       ddl-auto: update
@@ -19,8 +29,3 @@ spring:
     mode: HTML
     template-resolver-order: 0
     cache: true  # 운영시 true
-# 전체 레벨 전체 로깅 레벨 지정
-logging:
-  level:
-    root: info
-    com.yaans.vending.controller: debug
