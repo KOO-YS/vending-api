@@ -2,7 +2,14 @@ spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://vending-api.cl6wi7vlsrnn.ap-northeast-2.rds.amazonaws.com:3306/vending?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC
-    username: root
-    password: bespin8006^^
+    username: ENC(U4vHpyQHt9cLPdf8h7Xwww==)
+    password: ENC(D/DCQfRtyutVrGR9oHX08MUYdtlkemyi) # https://www.devglan.com/online-tools/jasypt-online-encryption-decryption
   jpa:
     show-sql: false
+jasypt:
+  encryptor:
+    bean: jasyptStringEncrptor
+    property:
+      prefix: ENC(
+      suffix: )
+      algorithm: PBEWithMD5AndDES

@@ -60,7 +60,7 @@
     <div class="collapse" id="collapseBudget">
         <div class="card card-body">
             <form>
-                <input type="text" name="budget" id="budget">
+                <input type="text" name="budget" placeholder="budget" id="budget">
                 <button class="btn btn-secondary" type="button" onclick="chargeBudget();">charge</button>
             </form>
         </div>
@@ -76,10 +76,10 @@
     <h1>Manager's</h1>
 </div>
 <script type="text/javascript">
-function buy(stockId, customerId, machineId) {
-    alert(stockId+" pick");
-    alert(customerId+" choose");
+const machineId = $("#machineId").val();
+const customerId = $("#customerId").val();
 
+function buy(stockId, customerId, machineId) {
     let data = {
         "stockId" : stockId,
         "customerId" : customerId,
@@ -99,8 +99,6 @@ function buy(stockId, customerId, machineId) {
 }
 
 function chargeBalance() {
-    let customerId = $("#customerId").val();
-    let machineId = $("#machineId").val();
     let balance = $("#balance").val();
 
     let data = {
@@ -124,7 +122,7 @@ function chargeBalance() {
 }
 
 function chargeBudget() {
-    let customerId = $("#customerId").val();
+    // let customerId = $("#customerId").val();
     let budget = $("#budget").val();
 
     let data = {
@@ -134,7 +132,7 @@ function chargeBudget() {
 
     jQuery.ajax({
         type : 'POST',
-        url : "/customer/charge",
+        url : "/customer/budget",
         data: JSON.stringify(data),
         contentType: "application/json",
         success: function(msg) {
