@@ -26,7 +26,7 @@
     <logger name="org.hibernate" level="info"/>
 
     <!-- root 전체 로깅 레벨 설정-->
-    <root level="">
+    <root>
         <appender-ref ref="CONSOLE"/> <!-- Console에 로그를 출력하고자 할 때 사용 -->
         <appender-ref ref="FILE"/> <!-- File로 로그를 남기고자 할 때 사용 -->
     </root>

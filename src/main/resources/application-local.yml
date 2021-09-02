@@ -8,4 +8,4 @@ spring:
     show-sql: true
 logging:
   file:
-    path: /logs
+    path: logs

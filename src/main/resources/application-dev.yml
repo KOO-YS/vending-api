@@ -15,4 +15,4 @@ jasypt:
       algorithm: PBEWithMD5AndDES
 logging:
   file:
-    path: ../logs-ec2
+    path: logs-ec2
