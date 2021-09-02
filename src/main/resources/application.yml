@@ -10,6 +10,7 @@ logging:
   level:
     root: info
     com.yaans.vending.controller: debug
+  config: classpath:logback-spring.xml
 
 spring:
   profiles:

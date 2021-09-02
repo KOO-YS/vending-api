@@ -6,4 +6,6 @@ spring:
     password: root
   jpa:
     show-sql: true
-
+logging:
+  file:
+    path: /logs

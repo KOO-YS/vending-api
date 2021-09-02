@@ -10,9 +10,9 @@
 
     <!--여러개의 파일을 롤링, 순회하면서 로그를 찍는다-->
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logfile/local_log.log</file>
+        <file>${LOG_PATH}/local_log.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>logfile/local_log.%d{yyyy-MM-dd}.log</fileNamePattern>
+            <fileNamePattern>${LOG_PATH}/local_log.%d{yyyy-MM-dd}.log</fileNamePattern>
             <maxHistory>30</maxHistory> <!--일자별 로그파일 최대 보관 주기-->
         </rollingPolicy>
 

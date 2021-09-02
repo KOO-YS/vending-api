@@ -9,6 +9,7 @@ class VendingApiApplicationTests {
 
     @Test
     void contextLoads() {
+
     }
 
 }
